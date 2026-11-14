@@ -5,164 +5,238 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>QLine · Live Queue Management</title>
 <style>
-:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#4f46e5;--acc2:#06b6d4;--ok:#16a34a;--bad:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#4f46e5;--acc2:#06b6d4;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}}
 :root[data-theme="dark"]{--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:960px;margin:0 auto;padding:16px}.narrow{max-width:460px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.logo{font-weight:800;font-size:20px;letter-spacing:-.5px}.logo b{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}.narrow{max-width:460px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px}.logo b{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
 .grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}@media(max-width:760px){.grid{grid-template-columns:1fr}}
 h2{margin:0 0 10px;font-size:16px}.mut{color:var(--mut);font-size:13px}
-.big{font-size:64px;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big{font-size:60px;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
 input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin:4px 0 12px}
-label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{width:42%;flex:none}
-.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--acc);color:#fff}
-.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.full{width:100%}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
-.tok{font-weight:800;color:var(--acc);min-width:42px}.acts{display:flex;gap:6px;flex-wrap:wrap}
-.ticket{text-align:center}.ticket .big{font-size:76px;margin:6px 0}
-.turn{background:linear-gradient(135deg,var(--ok),var(--acc2));color:#fff}.turn .mut,.turn h2{color:#fff}
+label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{width:44%;flex:none}
+.btn{border:0;border-radius:10px;padding:10px 15px;font:inherit;font-weight:700;cursor:pointer;background:var(--acc);color:#fff}
+.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.warn{background:var(--warn)}.btn.full{width:100%}.btn.sm{padding:5px 10px;font-size:13px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ticket{text-align:center}.ticket .big{font-size:72px;margin:6px 0}
+.turn{background:linear-gradient(135deg,var(--ok),var(--acc2));color:#fff}.turn .mut,.turn h2,.turn p{color:#fff}
+.alert{background:linear-gradient(135deg,var(--warn),var(--bad));color:#fff}.alert .mut,.alert h2{color:#fff}
 .bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin:14px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
 .board{text-align:center;padding:32px 16px}.board .big{font-size:120px}
 .chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}.chips div{padding:10px 18px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:700;font-size:20px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stats .card{padding:14px;text-align:center;margin:0}.stats b{font-size:24px;display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stats .card{padding:14px;text-align:center;margin:0}.stats b{font-size:24px;display:block}
 .log{font-size:13px;padding:8px 10px;border-left:3px solid #25d366;background:var(--bg);border-radius:6px;margin-bottom:6px}
 .err{color:var(--bad);font-size:13px;min-height:18px;margin:-6px 0 8px}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px}.chk input{width:auto;margin:3px 0 0}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+th{text-align:left;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.b{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.b.waiting{background:var(--acc)}.b.called{background:var(--warn)}.b.serving{background:var(--ok)}.b.done{background:#64748b}.b.cancelled{background:var(--bad)}
+.tsel{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.tsel select{width:auto;margin:0}
+
+:root{--g1:#e6e4fb;--g2:#dbe9f7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#16143a;--g2:#0c1a33}}
+:root[data-theme="dark"]{--g1:#16143a;--g2:#0c1a33}
+body.cust{background:linear-gradient(165deg,var(--g1),var(--g2)) fixed}
+.cust .card{border-radius:26px;box-shadow:0 10px 32px rgba(79,70,229,.12);padding:22px}
+h2.t{font-size:22px;font-weight:800;margin:0 0 6px}.m2{color:var(--mut);font-size:15px}
+.btn.lg{padding:15px;font-size:17px;border-radius:14px}.btn.out{background:transparent;border:1.5px solid #f3b4b4;color:var(--bad)}
+.pill{display:flex;align-items:center;justify-content:center;text-align:center;padding:12px 16px;border-radius:99px;font-weight:700;font-size:15px;margin-bottom:18px}
+.pill.ok{background:#dff5ec;color:#0f7a55;border:1px solid #a9e3cd}.pill.warn{background:#fdf1dc;color:#9a5b05;border:1px solid #f1d29a}.pill.neu{background:var(--bg);color:var(--mut);border:1px solid var(--line)}
+.hero{text-align:center}.ordn{font-size:92px;font-weight:900;line-height:1;letter-spacing:-4px;color:var(--acc)}
+.chip{display:block;width:max-content;max-width:100%;margin:14px auto;padding:9px 18px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:#0f7a55;font-weight:700;font-size:14px;text-align:center}
+.pbox{display:flex;gap:16px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:14px 16px;background:var(--bg);margin:6px 0 14px}.pbox>span{color:var(--mut);font-weight:600;font-size:15px;width:76px;flex:none}.pbox b{color:var(--acc);font-size:15px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tile{border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--bg);text-align:center}.tile span{display:block;color:var(--mut);font-size:14px;margin-bottom:4px}.tile b{font-size:34px;font-variant-numeric:tabular-nums}
+.tkc{display:block;width:max-content;margin:18px auto 0;padding:10px 26px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--mut);font-size:14px;letter-spacing:.5px}.tkc b{color:var(--ink);font-size:24px;margin-left:6px}
+.mT{font-size:30px;font-weight:800;text-align:center;margin:6px 0}.cd{font-size:56px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.turn .m2,.alert .m2,.turn .tkc,.alert .tkc,.turn .tkc b,.alert .tkc b{color:#fff}.turn .tkc,.alert .tkc{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,90px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;transition:.35s;max-width:90%;z-index:9}#toast.on{transform:translate(-50%,0)}
-.hide{display:none}
+.hide{display:none!important}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<!-- ===== PAGE 1: CUSTOMER (what the QR opens) ===== -->
+<!-- PAGE 1: CUSTOMER -->
 <main id="join" class="hide narrow">
 <header><div class="logo"><b>QLine</b></div><span class="mut">Sunrise Clinic · MG Road</span></header>
-<div class="card" id="joinCard"><h2>Join the queue</h2><p class="mut">No app needed. We’ll message you when it’s almost your turn.</p>
+<div class="card" id="joinCard"><h2>Join the queue</h2><p class="mut">No app needed. We’ll message you on WhatsApp when it’s your turn.</p>
 <label>Your name</label><input id="n" placeholder="e.g. Priya Sharma" autocomplete="name">
-<label>WhatsApp number</label>
-<div class="phone"><select id="cc"></select><input id="p" inputmode="numeric" placeholder="98765 43210" autocomplete="tel-national"></div>
+<label>WhatsApp number</label><div class="phone"><select id="cc"></select><input id="p" inputmode="numeric" placeholder="98765 43210"></div>
 <div class="err" id="perr"></div>
 <label>People</label><select id="s"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
 <label class="chk"><input type="checkbox" id="consent" checked><span>Send my queue updates on WhatsApp. Used only for this visit and deleted after 30 days.</span></label>
 <button class="btn full" id="joinBtn">Get my token</button></div>
-<div class="card ticket hide" id="ticket"><div class="mut">Your token</div><div class="big" id="tk">-</div>
-<h2 id="pos"></h2><div class="bar"><i id="pb"></i></div><div class="mut" id="eta"></div>
-<p class="mut" id="sub"></p><p class="mut">Now serving: <b id="cNow">-</b></p>
-<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
-  <button class="btn ghost" id="leave">Leave queue</button>
-  <button class="btn ghost" id="newParty">Join new party</button>
-</div>
-</div>
-<p class="mut" style="text-align:center"><a href="#staff" style="color:var(--mut)">Staff sign in</a></p>
+<div class="hide" id="ticket">
+<div class="card hide" id="decide"><h2 class="t">Checking your state</h2><p class="m2">You’ve seen the wait time. Let us know what you’d like to do: wait in the line, or leave the line?</p><button class="btn lg full" id="willWait">I will wait</button><button class="btn lg out full" id="willLeave" style="margin-top:10px">⎋ I will leave</button></div>
+<div class="card" id="tcard">
+<div class="pill neu" id="pill"></div>
+<div class="hero" id="hero"><div class="ordn" id="pos">-</div><div class="m2">in line</div></div>
+<div class="chip" id="party"></div>
+<div class="pbox" id="pbox"><span>Queue Progress</span><div style="flex:1"><b id="progTxt"></b><div class="bar" style="margin:8px 0 0"><i id="pb"></i></div></div></div>
+<div class="tiles" id="tiles"><div class="tile"><span>👥 People ahead</span><b id="ahead">-</b></div><div class="tile"><span>🕒 Est. wait</span><b id="eta">-</b></div></div>
+<div id="msg" class="hide"><div class="mT" id="mT"></div><div class="cd" id="cd"></div><p class="m2" id="sub" style="text-align:center"></p></div>
+<button class="btn ok lg full hide" id="conf">✓ Confirm, I’m on my way</button>
+<div class="tkc">TOKEN <b id="tk">-</b></div>
+<div style="text-align:center;margin-top:14px"><button class="btn ghost sm hide" id="leave">Leave queue</button></div>
+<button class="btn lg full hide" id="rejoin" style="margin-top:14px">Join the queue again</button>
+</div></div>
+<p class="mut" style="text-align:center">Now serving: <b id="cNow">-</b> · <a href="#staff" style="color:var(--mut)">Staff sign in</a></p>
 </main>
 
-<!-- ===== PAGE 2: STAFF (login required) ===== -->
+<!-- PAGE 2: STAFF -->
 <main id="staff" class="hide">
-<div id="login" class="narrow" style="margin:40px auto"><div class="card"><div class="logo" style="margin-bottom:12px"><b>QLine</b> Staff</div>
-<h2>Sign in</h2><label>Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Staff password">
-<div class="err" id="lerr"></div><button class="btn full" id="loginBtn">Sign in</button>
-<p class="mut" style="margin-top:12px">Demo password: <b>staff123</b></p></div></div>
+<div id="login" class="narrow" style="margin-top:40px"><div class="card"><div class="logo" style="margin-bottom:12px"><b>QLine</b> Staff</div>
+<h2>Sign in</h2><label>Password</label><input id="pw" type="password" placeholder="Staff password">
+<div class="err" id="lerr"></div><button class="btn full" id="loginBtn">Sign in</button><p class="mut" style="margin-top:12px">Demo password: <b>staff123</b></p></div></div>
 <div id="console" class="hide">
-<header><div class="logo"><b>QLine</b> Staff · <span class="mut">Sunrise Clinic</span></div><button class="btn ghost" id="logout">Log out</button></header>
-<div class="stats"><div class="card"><b id="stW">0</b><span class="mut">Waiting</span></div><div class="card"><b id="stD">0</b><span class="mut">Served</span></div><div class="card"><b id="stA">0</b><span class="mut">Avg wait (min)</span></div></div>
-<div class="grid" style="margin-top:16px"><div>
-<div class="card"><h2>Now serving</h2><div class="big" id="sNow">-</div><p id="sName" class="mut">Nobody yet</p>
-<div class="acts"><button class="btn" id="next">Call next</button><button class="btn ok" id="done">Complete</button><button class="btn bad" id="ns">No-show</button></div></div>
-<div class="card"><h2>Add walk-in</h2><input id="wn" placeholder="Name"><button class="btn ghost" id="addw">Add to queue</button>
-<p class="mut" style="margin-top:14px">Avg minutes per person: <b id="avgV">6</b></p><input type="range" id="avg" min="2" max="30" value="6"></div></div>
-<div><div class="card"><h2>Waiting list</h2><div id="list"></div></div>
-<div class="card"><h2>Message log</h2><div id="log"><p class="mut">Alerts you trigger appear here.</p></div></div>
-<div class="card"><h2>Share links</h2><p class="mut">Customer QR points to: <b>…#join</b><br>Waiting-room screen: <b>…#board</b></p></div></div></div></div>
-</main>
+<header><div class="logo"><b>QLine</b> Staff · <span class="mut">Sunrise Clinic</span></div><div class="acts" style="margin:0"><button class="btn ghost sm" id="reset">Reset demo</button><button class="btn ghost sm" id="logout">Log out</button></div></header>
+<div class="stats"><div class="card"><b id="stW">0</b><span class="mut">In line</span></div><div class="card"><b id="stD">0</b><span class="mut">Served</span></div><div class="card"><b id="stA">0</b><span class="mut">Avg wait (min)</span></div><div class="card"><b id="stC">0</b><span class="mut">Cancelled</span></div></div>
+<div class="grid"><div class="card"><h2>Counter 1</h2><div id="aEmpty" class="mut">Nobody at the counter. Call the next person.</div>
+<div id="aBox" class="hide"><span class="b called" id="aSt">Called</span> <b id="aTok"></b> · <span id="aName"></span>
+<div class="big" id="aTime" style="margin:10px 0">00:00</div><div class="mut" id="aLbl"></div></div>
+<div class="acts"><button class="btn" id="next">Call next</button><button class="btn" id="start">Start service</button><button class="btn ok" id="done">Complete</button><button class="btn bad" id="ns">No-show</button></div>
+<div class="acts" id="delay"><span class="mut" style="align-self:center">Running late?</span><button class="btn warn sm" id="d1">+1 min</button><button class="btn warn sm" id="d5">+5 min</button><button class="btn ghost sm" id="dm">−1 min</button></div></div>
+<div class="card"><h2>Settings &amp; walk-ins</h2><p class="mut">Avg minutes per person: <b id="avgV">6</b></p><input type="range" id="avg" min="2" max="30" value="6">
+<label class="chk"><input type="checkbox" id="fast"><span>Demo timers (1 min = 3 seconds) to test warnings quickly</span></label>
+<input id="wn" placeholder="Walk-in name"><button class="btn ghost" id="addw">Add walk-in</button>
+<p class="mut" style="margin-top:12px">Rule: after you call someone, they get 3 warnings, 5 min apart. No confirmation after the 3rd and they’re removed and must rejoin.</p></div></div>
+<div class="card"><div class="tsel"><h2 style="margin:0">Queue table</h2><select id="flt"><option value="live">Active + waiting</option><option value="all">Everyone today</option></select></div>
+<div class="tw"><table><thead><tr><th>Pos</th><th>Token</th><th>Name</th><th>Phone</th><th>People</th><th>Joined</th><th>Waited</th><th>Ahead</th><th>Status</th><th>Est. wait</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>
+<div class="card"><h2>WhatsApp message log</h2><div id="log"></div></div>
+</div></main>
 
-<!-- ===== PAGE 3: DISPLAY BOARD (read-only, no names or numbers) ===== -->
+<!-- PAGE 3: DISPLAY -->
 <main id="board" class="hide"><div class="card board"><div class="mut" style="font-size:20px">NOW SERVING</div><div class="big" id="bNow">-</div><div class="mut">Up next</div><div class="chips" id="bNext"></div></div></main>
 </div>
 <div id="toast"></div>
 
 <script>
-const PASS='staff123'; // DEMO ONLY: real version checks on the server
+const PASS='staff123'; // DEMO ONLY: the real version checks this on the server
 const $=id=>document.getElementById(id);
-const CC=[['+91','🇮🇳 India +91'],['+1','🇺🇸 USA/Canada +1'],['+44','🇬🇧 UK +44'],['+971','🇦🇪 UAE +971'],['+65','🇸🇬 Singapore +65'],['+61','🇦🇺 Australia +61'],['+49','🇩🇪 Germany +49'],['+33','🇫🇷 France +33'],['+81','🇯🇵 Japan +81'],['+86','🇨🇳 China +86'],['+880','🇧🇩 Bangladesh +880'],['+94','🇱🇰 Sri Lanka +94'],['+977','🇳🇵 Nepal +977'],['+92','🇵🇰 Pakistan +92'],['+966','🇸🇦 Saudi Arabia +966'],['+27','🇿🇦 South Africa +27']];
+const CC=[['+91','🇮🇳 India +91'],['+1','🇺🇸 USA/Canada +1'],['+44','🇬🇧 UK +44'],['+971','🇦🇪 UAE +971'],['+65','🇸🇬 Singapore +65'],['+61','🇦🇺 Australia +61'],['+49','🇩🇪 Germany +49'],['+33','🇫🇷 France +33'],['+81','🇯🇵 Japan +81'],['+880','🇧🇩 Bangladesh +880'],['+94','🇱🇰 Sri Lanka +94'],['+977','🇳🇵 Nepal +977'],['+966','🇸🇦 Saudi +966']];
 $('cc').innerHTML=CC.map(c=>'<option value="'+c[0]+'">'+c[1]+'</option>').join('');
-const S={q:[],last:0,serving:null,avg:6,waits:[],done:0,log:[]};
-let me=null,authed=false;
-const tokStr=n=>'A-'+(100+n);
+const S={people:[],last:0,avg:6,fast:false,log:[]};let me=null,authed=false;
+const MIN=()=>S.fast?3000:60000,tok=n=>'#'+(100+n),now=()=>Date.now();
+const act=()=>S.people.find(p=>p.status==='called'||p.status==='serving'),wait=()=>S.people.filter(p=>p.status==='waiting');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2600)}
-function save(){try{localStorage.setItem('qline2',JSON.stringify(S))}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('qline2')||'null');if(d)Object.assign(S,d)}catch(e){}
-  try{me=JSON.parse(localStorage.getItem('qline2me')||'null')}catch(e){}
-  try{authed=sessionStorage.getItem('qline2auth')==='1'}catch(e){}}
-function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
-const mask=p=>p.slice(0,-4).replace(/\d(?=.{0,})/g,(m,i)=>i>3?'•':m)+p.slice(-2);
-function send(p,text){ // simulated WhatsApp; real version calls WhatsApp Business API on the server
-  if(!p.phone||!p.wa)return;S.log.unshift({to:p.phone,text,at:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});S.log=S.log.slice(0,8)}
-function validPhone(cc,n){return cc==='+91'?/^[6-9]\d{9}$/.test(n):/^\d{6,14}$/.test(n)}
+const mmss=ms=>{const s=Math.max(0,Math.ceil(ms/MIN()*60));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const clock=t=>new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+const mask=p=>p?p.slice(0,3)+'••••••'+p.slice(-2):'-';
+const ord=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2800)}
+function save(){try{localStorage.setItem('qline3',JSON.stringify(S))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('qline3')||'null');if(d)Object.assign(S,d)}catch(e){}
+ try{me=JSON.parse(localStorage.getItem('qline3me')||'null')}catch(e){}
+ try{authed=sessionStorage.getItem('qline3auth')==='1'}catch(e){}}
+function send(p,text){if(!p.phone||!p.wa)return;S.log.unshift({to:p.phone,text,at:clock(now())});S.log=S.log.slice(0,10)} // simulated; real version uses the WhatsApp Business API
+const remain=a=>!a?0:a.status==='serving'?Math.max(0,a.endsAt-now()):S.avg*MIN();
+const eta=i=>remain(act())+i*S.avg*MIN();
+const okPhone=(cc,n)=>cc==='+91'?/^[6-9]\d{9}$/.test(n):/^\d{6,14}$/.test(n);
 
-/* ----- customer actions ----- */
-$('joinBtn').onclick=()=>{
-  const name=$('n').value.trim(),cc=$('cc').value,num=$('p').value.replace(/\D/g,'').replace(/^0+/,'');
-  if(!name){$('perr').textContent='Please enter your name.';return}
-  if(!validPhone(cc,num)){$('perr').textContent=cc==='+91'?'Enter a valid 10-digit Indian mobile number.':'Enter a valid phone number (6 to 14 digits).';return}
-  $('perr').textContent='';load();S.last++;
-  const p={id:S.last,name,size:$('s').value,phone:cc+num,wa:$('consent').checked,at:Date.now()};
-  S.q.push(p);me=p.id;send(p,'You’re in the queue at Sunrise Clinic. Token '+tokStr(p.id)+'.');
-  save();try{localStorage.setItem('qline2me',JSON.stringify(me))}catch(e){}render();toast('You’re in! Token '+tokStr(p.id))};
-$('leave').onclick=()=>{load();S.q=S.q.filter(p=>p.id!==me);me=null;save();try{localStorage.removeItem('qline2me')}catch(e){}render()};
-$('newParty').onclick=()=>{me=null;try{localStorage.removeItem('qline2me')}catch(e){}render()};
+/* ---- warnings engine: 3 warnings, 5 min apart, then cancel (runs on the server in the real build) ---- */
+function tick(){load();const a=act();let ch=false;
+ if(a&&a.status==='called'&&!a.confirmed){const el=now()-a.calledAt,u=MIN()*5,should=Math.min(3,Math.floor(el/u)+1);
+  while(a.warns<should){a.warns++;ch=true;send(a,a.warns===1?'It’s your turn! Token '+tok(a.id)+'. Please confirm and come to Counter 1.':'Warning '+a.warns+' of 3: please confirm token '+tok(a.id)+' now.')}
+  if(el>=u*3){a.status='cancelled';a.reason='No-show after 3 warnings';send(a,'Your token '+tok(a.id)+' was cancelled. Please join the queue again.');ch=true}}
+ if(ch)save();render()}
 
-/* ----- staff actions (only reachable after login) ----- */
-function guard(){if(!authed){route();return false}load();return true}
-$('loginBtn').onclick=()=>{if($('pw').value===PASS){authed=true;try{sessionStorage.setItem('qline2auth','1')}catch(e){}$('pw').value='';$('lerr').textContent='';route()}else $('lerr').textContent='Incorrect password.'};
+/* ---- customer ---- */
+$('joinBtn').onclick=()=>{load();const name=$('n').value.trim(),cc=$('cc').value,num=$('p').value.replace(/\D/g,'').replace(/^0+/,'');
+ if(!name){$('perr').textContent='Please enter your name.';return}
+ if(!okPhone(cc,num)){$('perr').textContent=cc==='+91'?'Enter a valid 10-digit Indian mobile number.':'Enter a valid phone number (6 to 14 digits).';return}
+ $('perr').textContent='';S.last++;const p={id:S.last,name,size:$('s').value,phone:cc+num,wa:$('consent').checked,at:now(),status:'waiting',warns:0};
+ S.people.push(p);me=p.id;send(p,'You’re in the queue at Sunrise Clinic. Token '+tok(p.id)+'.');save();try{localStorage.setItem('qline3me',JSON.stringify(me))}catch(e){}render();toast('You’re in! Token '+tok(p.id))};
+$('conf').onclick=()=>{load();const p=S.people.find(x=>x.id===me);if(p&&p.status==='called'){p.confirmed=true;p.confirmedAt=now();save();render();toast('Confirmed. See you at the counter!')}};
+$('leave').onclick=()=>{load();const p=S.people.find(x=>x.id===me);if(p){p.status='cancelled';p.reason='Left the queue';save()}render()};
+$('willWait').onclick=()=>{load();const p=S.people.find(x=>x.id===me);if(p){p.decided=true;save()}render()};
+$('willLeave').onclick=()=>{load();const p=S.people.find(x=>x.id===me);if(p){p.status='cancelled';p.reason='Chose to leave after seeing the wait';save()}render()};
+$('rejoin').onclick=()=>{me=null;try{localStorage.removeItem('qline3me')}catch(e){}render()};
+
+/* ---- staff ---- */
+const guard=()=>{if(!authed){route();return false}load();return true};
+$('loginBtn').onclick=()=>{if($('pw').value===PASS){authed=true;try{sessionStorage.setItem('qline3auth','1')}catch(e){}$('pw').value='';$('lerr').textContent='';route()}else $('lerr').textContent='Incorrect password.'};
 $('pw').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};
-$('logout').onclick=()=>{authed=false;try{sessionStorage.removeItem('qline2auth')}catch(e){}route()};
-$('next').onclick=()=>{if(!guard())return;if(S.serving)S.done++;
-  if(!S.q.length){S.serving=null;save();render();toast('Queue is empty');return}
-  const p=S.q.shift();S.serving=p;S.waits.push((Date.now()-p.at)/60000);
-  send(p,'It’s your turn! Token '+tokStr(p.id)+', please go to Counter 1.');
-  if(S.q[1])send(S.q[1],'Almost there: 2 people ahead of you.');
-  save();render();toast(p.wa?'WhatsApp sent to '+p.phone:'Called '+p.name)};
-$('done').onclick=()=>{if(!guard())return;if(S.serving)S.done++;S.serving=null;save();render()};
-$('ns').onclick=()=>{if(!guard())return;S.serving=null;save();render();toast('Marked as no-show')};
-$('addw').onclick=()=>{if(!guard())return;S.last++;S.q.push({id:S.last,name:$('wn').value.trim()||'Walk-in',size:1,phone:'',wa:false,at:Date.now()});$('wn').value='';save();render()};
+$('logout').onclick=()=>{authed=false;try{sessionStorage.removeItem('qline3auth')}catch(e){}route()};
+$('next').onclick=()=>{if(!guard())return;if(act())return toast('Finish the current customer first');const w=wait()[0];if(!w)return toast('Nobody is waiting');
+ w.status='called';w.calledAt=now();w.warns=0;save();tick();toast('Called '+tok(w.id)+(w.wa?' · WhatsApp sent':''))};
+$('start').onclick=()=>{if(!guard())return;const a=act();if(!a||a.status!=='called')return;a.status='serving';a.startAt=now();a.endsAt=now()+S.avg*MIN();save();render()};
+$('done').onclick=()=>{if(!guard())return;const a=act();if(!a)return;a.status='done';a.doneAt=now();save();render()};
+$('ns').onclick=()=>{if(!guard())return;const a=act();if(!a)return;a.status='cancelled';a.reason='Marked no-show by staff';save();render()};
+const late=m=>()=>{if(!guard())return;const a=act();if(a&&a.status==='serving'){a.endsAt=Math.max(now(),a.endsAt+m*MIN());save();render();toast('Everyone’s estimate updated')}};
+$('d1').onclick=late(1);$('d5').onclick=late(5);$('dm').onclick=late(-1);
+$('addw').onclick=()=>{if(!guard())return;S.last++;S.people.push({id:S.last,name:$('wn').value.trim()||'Walk-in',size:1,phone:'',wa:false,at:now(),status:'waiting',warns:0});$('wn').value='';save();render()};
 $('avg').oninput=e=>{if(!guard())return;S.avg=+e.target.value;save();render()};
-window.rm=id=>{if(!guard())return;S.q=S.q.filter(p=>p.id!==id);save();render()};
+$('fast').onchange=e=>{if(!guard())return;S.fast=e.target.checked;save();render()};
+$('flt').onchange=render;
+$('reset').onclick=()=>{if(!guard())return;S.people=[];S.last=0;S.log=[];save();render()};
+window.rm=id=>{if(!guard())return;const p=S.people.find(x=>x.id===id);if(p){p.status='cancelled';p.reason='Removed by staff';save();render()}};
 
-/* ----- rendering ----- */
+/* ---- render ---- */
+const LBL={waiting:'Waiting',called:'Called',serving:'Being served',done:'Done',cancelled:'Cancelled'};
 function render(){
-  const now=S.serving?tokStr(S.serving.id):'-';
-  ['cNow','sNow','bNow'].forEach(i=>$(i).textContent=now);
-  $('bNext').innerHTML=S.q.slice(0,4).map(p=>'<div>'+tokStr(p.id)+'</div>').join('')||'<span class="mut">No one waiting</span>';
-  if(authed){
-    $('sName').textContent=S.serving?S.serving.name+' ('+S.serving.size+' people)':'Nobody yet';
-    $('stW').textContent=S.q.length;$('stD').textContent=S.done;
-    $('stA').textContent=S.waits.length?Math.round(S.waits.reduce((a,b)=>a+b,0)/S.waits.length):0;
-    $('avgV').textContent=S.avg;$('avg').value=S.avg;
-    $('list').innerHTML=S.q.map((p,i)=>'<div class="row"><span class="tok">'+tokStr(p.id)+'</span><div style="flex:1"><b>'+esc(p.name)+'</b><div class="mut">'+(p.phone?esc(mask(p.phone))+' · ':'')+p.size+' people · ~'+(i+1)*S.avg+' min</div></div><button class="btn ghost" style="padding:6px 10px" onclick="rm('+p.id+')">Remove</button></div>').join('')||'<p class="mut">Queue is empty.</p>';
-    $('log').innerHTML=S.log.map(l=>'<div class="log"><b>WhatsApp → '+esc(mask(l.to))+'</b> · '+l.at+'<br>'+esc(l.text)+'</div>').join('')||'<p class="mut">Alerts you trigger appear here.</p>'}
-  const idx=S.q.findIndex(p=>p.id===me),t=$('ticket'),j=$('joinCard');
-  if(me&&(idx>=0||(S.serving&&S.serving.id===me))){
-    j.classList.add('hide');t.classList.remove('hide','turn');$('tk').textContent=tokStr(me);
-    if(idx>=0){$('pos').textContent='You’re '+ord(idx+1)+' in line';$('eta').textContent='Estimated wait ~'+(idx+1)*S.avg+' min';$('pb').style.width=Math.max(8,100-idx*18)+'%';$('sub').textContent='Step out and come back. We’ll notify you on WhatsApp.'}
-    else{t.classList.add('turn');$('pos').textContent='It’s your turn!';$('eta').textContent='Please go to Counter 1';$('pb').style.width='100%';$('sub').textContent=''}
-  }else{if(me&&idx<0&&!(S.serving&&S.serving.id===me)){me=null;try{localStorage.removeItem('qline2me')}catch(e){}}t.classList.add('hide');j.classList.remove('hide')}}
+ const a=act(),w=wait();
+ ['cNow','bNow'].forEach(i=>$(i).textContent=a?tok(a.id):'-');
+ $('bNext').innerHTML=w.slice(0,4).map(p=>'<div>'+tok(p.id)+'</div>').join('')||'<span class="mut">No one waiting</span>';
+ if(authed)renderStaff(a,w);
+ renderMe(a,w)}
+function renderStaff(a,w){
+ const dn=S.people.filter(p=>p.status==='done'),cn=S.people.filter(p=>p.status==='cancelled'),cl=S.people.filter(p=>p.calledAt);
+ $('stW').textContent=w.length;$('stD').textContent=dn.length;$('stC').textContent=cn.length;
+ $('stA').textContent=cl.length?Math.round(cl.reduce((s,p)=>s+(p.calledAt-p.at)/MIN(),0)/cl.length):0;
+ $('avgV').textContent=S.avg;$('avg').value=S.avg;$('fast').checked=S.fast;
+ $('aEmpty').classList.toggle('hide',!!a);$('aBox').classList.toggle('hide',!a);
+ $('next').classList.toggle('hide',!!a);$('start').classList.toggle('hide',!(a&&a.status==='called'));
+ $('done').classList.toggle('hide',!a);$('ns').classList.toggle('hide',!a);$('delay').classList.toggle('hide',!(a&&a.status==='serving'));
+ if(a){$('aTok').textContent=tok(a.id);$('aName').textContent=a.name;$('aSt').className='b '+a.status;
+  if(a.status==='called'){$('aSt').textContent=a.confirmed?'Confirmed ✓':'Awaiting confirmation';
+   $('aTime').textContent=a.confirmed?'--:--':mmss(MIN()*15-(now()-a.calledAt));$('aLbl').textContent=a.confirmed?'Customer is on the way. Tap Start service when they arrive.':'Time before auto-cancel · Warning '+a.warns+' of 3 sent'}
+  else{$('aSt').textContent='Being served';const r=a.endsAt-now();$('aTime').textContent=r>=0?mmss(r):'+'+mmss(-r);$('aLbl').textContent=r>=0?'Estimated time left (avg '+S.avg+' min)':'Running over. Use +1 / +5 min to update everyone’s ETA'}}
+ const order=[...(a?[a]:[]),...w,...S.people.filter(p=>p.status==='done'||p.status==='cancelled').reverse()];
+ const rows=$('flt').value==='live'?order.filter(p=>['waiting','called','serving'].includes(p.status)):order;
+ $('tb').innerHTML=rows.map(p=>{const i=w.findIndex(x=>x.id===p.id),isW=i>=0;
+  const waited=(p.status==='waiting'?now():(p.calledAt||p.doneAt||now()))-p.at;
+  return '<tr><td>'+(isW?i+1:'-')+'</td><td><b>'+tok(p.id)+'</b></td><td>'+esc(p.name)+'</td><td>'+esc(mask(p.phone))+'</td><td>'+p.size+'</td><td>'+clock(p.at)+'</td><td>'+Math.floor(waited/MIN())+' min</td><td>'+(isW?i:'-')+'</td><td><span class="b '+p.status+'">'+(p.status==='called'&&p.confirmed?'Confirmed ✓':LBL[p.status])+'</span>'+(p.reason?'<div class="mut">'+esc(p.reason)+'</div>':'')+'</td><td>'+(isW?mmss(eta(i)):'-')+'</td><td>'+(isW?'<button class="btn ghost sm" onclick="rm('+p.id+')">Remove</button>':'')+'</td></tr>'}).join('')||'<tr><td colspan="11" class="mut">No one here yet.</td></tr>';
+ $('log').innerHTML=S.log.map(l=>'<div class="log"><b>WhatsApp → '+esc(mask(l.to))+'</b> · '+l.at+'<br>'+esc(l.text)+'</div>').join('')||'<p class="mut">Alerts appear here.</p>'}
+function renderMe(a,w){
+ const p=S.people.find(x=>x.id===me),t=$('ticket'),j=$('joinCard');
+ if(!p){t.classList.add('hide');j.classList.remove('hide');return}
+ j.classList.add('hide');t.classList.remove('hide');
+ const st=p.status,c=$('tcard'),W=st==='waiting',i=w.findIndex(x=>x.id===p.id);
+ c.classList.remove('turn','alert');$('tk').textContent=tok(p.id);
+ $('decide').classList.toggle('hide',!(W&&!p.decided));
+ ['pill','hero','party','pbox','tiles'].forEach(k=>$(k).classList.toggle('hide',!W));
+ $('msg').classList.toggle('hide',W);$('conf').classList.add('hide');
+ $('leave').classList.toggle('hide',!(W&&p.decided));$('rejoin').classList.toggle('hide',!(st==='done'||st==='cancelled'));
+ if(W){
+  const cl=S.people.filter(x=>x.calledAt&&x.calledAt>=p.at).length,el=Math.max(1,Math.round((now()-p.at)/MIN())),fast=cl>0&&(now()-p.at)/cl<=S.avg*MIN()*1.2;
+  $('pill').className='pill '+(cl?(fast?'ok':'warn'):'neu');
+  $('pill').textContent=cl?(fast?'⚡ Moving fast':'🐢 Moving slowly')+' · '+cl+' ahead of you cleared in '+el+' min':'Waiting for the first call';
+  $('pos').textContent=ord(i+1);
+  const bk=x=>{const m=parseInt(x.size)||1;return m>=5?'5+':m>=3?'3-4':'1-2'},b=bk(p),same=w.filter(x=>bk(x)===b);
+  $('party').textContent='Party of '+p.size+' · '+ord(same.findIndex(x=>x.id===p.id)+1)+' among groups of '+b;
+  const pct=Math.round(100*cl/(cl+i+1));
+  $('progTxt').textContent=pct+'% complete ('+cl+' served since check-in)';$('pb').style.width=Math.max(2,pct)+'%';
+  const e=eta(i);$('ahead').textContent=i;$('eta').textContent=e/MIN()>=60?'> 1h':mmss(e)}
+ else if(st==='called'){c.classList.add(p.confirmed?'turn':'alert');$('mT').textContent=p.confirmed?'Confirmed ✓':'It’s your turn!';
+  if(p.confirmed){$('cd').textContent='Counter 1';$('sub').textContent='Please head to the counter now.'}
+  else{$('conf').classList.remove('hide');$('cd').textContent=mmss(MIN()*15-(now()-p.calledAt));$('sub').textContent='Time left to confirm · Warning '+p.warns+' of 3. If you don’t confirm, you’ll be removed and must rejoin.'}}
+ else if(st==='serving'){c.classList.add('turn');$('mT').textContent='You’re being served';const r=p.endsAt-now();$('cd').textContent=r>0?mmss(r):'…';$('sub').textContent=r>0?'Estimated time left':'Taking a little longer…'}
+ else if(st==='done'){$('mT').textContent='All done. Thank you!';$('cd').textContent='✓';$('sub').textContent=''}
+ else{c.classList.add('alert');$('mT').textContent='You were removed';$('cd').textContent='';$('sub').textContent=(p.reason?p.reason+'. ':'')+'You can join the queue again any time.'}}
 
-/* ----- router: each URL shows ONE page and nothing else ----- */
-function route(){
-  const h=location.hash.slice(1),page=['join','staff','board'].includes(h)?h:'join'; // default = customer page
-  ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide',x!==page));
-  if(page==='staff'){$('login').classList.toggle('hide',authed);$('console').classList.toggle('hide',!authed)}
-  render()}
-window.addEventListener('hashchange',route);
-window.addEventListener('storage',()=>{load();render()}); // live sync across tabs
-setInterval(()=>{load();render()},3000);
-load();route();
+/* ---- router: one URL = one page ---- */
+function route(){const h=location.hash.slice(1),pg=['join','staff','board'].includes(h)?h:'join';
+ ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide',x!==pg));document.body.classList.toggle('cust',pg==='join');
+ if(pg==='staff'){$('login').classList.toggle('hide',authed);$('console').classList.toggle('hide',!authed)}render()}
+addEventListener('hashchange',route);addEventListener('storage',()=>{load();render()});
+setInterval(tick,1000);load();route();
 </script>
 </body>
 </html>
