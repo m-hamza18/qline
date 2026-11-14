@@ -52,7 +52,12 @@ label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{w
 <button class="btn full" id="joinBtn">Get my token</button></div>
 <div class="card ticket hide" id="ticket"><div class="mut">Your token</div><div class="big" id="tk">-</div>
 <h2 id="pos"></h2><div class="bar"><i id="pb"></i></div><div class="mut" id="eta"></div>
-<p class="mut" id="sub"></p><p class="mut">Now serving: <b id="cNow">-</b></p><button class="btn ghost" id="leave">Leave queue</button></div>
+<p class="mut" id="sub"></p><p class="mut">Now serving: <b id="cNow">-</b></p>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+  <button class="btn ghost" id="leave">Leave queue</button>
+  <button class="btn ghost" id="newParty">Join new party</button>
+</div>
+</div>
 <p class="mut" style="text-align:center"><a href="#staff" style="color:var(--mut)">Staff sign in</a></p>
 </main>
 
@@ -110,6 +115,7 @@ $('joinBtn').onclick=()=>{
   S.q.push(p);me=p.id;send(p,'You’re in the queue at Sunrise Clinic. Token '+tokStr(p.id)+'.');
   save();try{localStorage.setItem('qline2me',JSON.stringify(me))}catch(e){}render();toast('You’re in! Token '+tokStr(p.id))};
 $('leave').onclick=()=>{load();S.q=S.q.filter(p=>p.id!==me);me=null;save();try{localStorage.removeItem('qline2me')}catch(e){}render()};
+$('newParty').onclick=()=>{me=null;try{localStorage.removeItem('qline2me')}catch(e){}render()};
 
 /* ----- staff actions (only reachable after login) ----- */
 function guard(){if(!authed){route();return false}load();return true}
