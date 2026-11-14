@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QLine · Live Queue Management</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#4f46e5;--acc2:#06b6d4;--ok:#16a34a;--bad:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}}
+:root[data-theme="dark"]{--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:16px}.narrow{max-width:460px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.5px}.logo b{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+h2{margin:0 0 10px;font-size:16px}.mut{color:var(--mut);font-size:13px}
+.big{font-size:64px;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin:4px 0 12px}
+label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{width:42%;flex:none}
+.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--acc);color:#fff}
+.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.full{width:100%}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.tok{font-weight:800;color:var(--acc);min-width:42px}.acts{display:flex;gap:6px;flex-wrap:wrap}
+.ticket{text-align:center}.ticket .big{font-size:76px;margin:6px 0}
+.turn{background:linear-gradient(135deg,var(--ok),var(--acc2));color:#fff}.turn .mut,.turn h2{color:#fff}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin:14px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+.board{text-align:center;padding:32px 16px}.board .big{font-size:120px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}.chips div{padding:10px 18px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:700;font-size:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stats .card{padding:14px;text-align:center;margin:0}.stats b{font-size:24px;display:block}
+.log{font-size:13px;padding:8px 10px;border-left:3px solid #25d366;background:var(--bg);border-radius:6px;margin-bottom:6px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:-6px 0 8px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px}.chk input{width:auto;margin:3px 0 0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,90px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;transition:.35s;max-width:90%;z-index:9}#toast.on{transform:translate(-50%,0)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== PAGE 1: CUSTOMER (what the QR opens) ===== -->
+<main id="join" class="hide narrow">
+<header><div class="logo"><b>QLine</b></div><span class="mut">Sunrise Clinic · MG Road</span></header>
+<div class="card" id="joinCard"><h2>Join the queue</h2><p class="mut">No app needed. We’ll message you when it’s almost your turn.</p>
+<label>Your name</label><input id="n" placeholder="e.g. Priya Sharma" autocomplete="name">
+<label>WhatsApp number</label>
+<div class="phone"><select id="cc"></select><input id="p" inputmode="numeric" placeholder="98765 43210" autocomplete="tel-national"></div>
+<div class="err" id="perr"></div>
+<label>People</label><select id="s"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+<label class="chk"><input type="checkbox" id="consent" checked><span>Send my queue updates on WhatsApp. Used only for this visit and deleted after 30 days.</span></label>
+<button class="btn full" id="joinBtn">Get my token</button></div>
+<div class="card ticket hide" id="ticket"><div class="mut">Your token</div><div class="big" id="tk">-</div>
+<h2 id="pos"></h2><div class="bar"><i id="pb"></i></div><div class="mut" id="eta"></div>
+<p class="mut" id="sub"></p><p class="mut">Now serving: <b id="cNow">-</b></p><button class="btn ghost" id="leave">Leave queue</button></div>
+<p class="mut" style="text-align:center"><a href="#staff" style="color:var(--mut)">Staff sign in</a></p>
+</main>
+
+<!-- ===== PAGE 2: STAFF (login required) ===== -->
+<main id="staff" class="hide">
+<div id="login" class="narrow" style="margin:40px auto"><div class="card"><div class="logo" style="margin-bottom:12px"><b>QLine</b> Staff</div>
+<h2>Sign in</h2><label>Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Staff password">
+<div class="err" id="lerr"></div><button class="btn full" id="loginBtn">Sign in</button>
+<p class="mut" style="margin-top:12px">Demo password: <b>staff123</b></p></div></div>
+<div id="console" class="hide">
+<header><div class="logo"><b>QLine</b> Staff · <span class="mut">Sunrise Clinic</span></div><button class="btn ghost" id="logout">Log out</button></header>
+<div class="stats"><div class="card"><b id="stW">0</b><span class="mut">Waiting</span></div><div class="card"><b id="stD">0</b><span class="mut">Served</span></div><div class="card"><b id="stA">0</b><span class="mut">Avg wait (min)</span></div></div>
+<div class="grid" style="margin-top:16px"><div>
+<div class="card"><h2>Now serving</h2><div class="big" id="sNow">-</div><p id="sName" class="mut">Nobody yet</p>
+<div class="acts"><button class="btn" id="next">Call next</button><button class="btn ok" id="done">Complete</button><button class="btn bad" id="ns">No-show</button></div></div>
+<div class="card"><h2>Add walk-in</h2><input id="wn" placeholder="Name"><button class="btn ghost" id="addw">Add to queue</button>
+<p class="mut" style="margin-top:14px">Avg minutes per person: <b id="avgV">6</b></p><input type="range" id="avg" min="2" max="30" value="6"></div></div>
+<div><div class="card"><h2>Waiting list</h2><div id="list"></div></div>
+<div class="card"><h2>Message log</h2><div id="log"><p class="mut">Alerts you trigger appear here.</p></div></div>
+<div class="card"><h2>Share links</h2><p class="mut">Customer QR points to: <b>…#join</b><br>Waiting-room screen: <b>…#board</b></p></div></div></div></div>
+</main>
+
+<!-- ===== PAGE 3: DISPLAY BOARD (read-only, no names or numbers) ===== -->
+<main id="board" class="hide"><div class="card board"><div class="mut" style="font-size:20px">NOW SERVING</div><div class="big" id="bNow">-</div><div class="mut">Up next</div><div class="chips" id="bNext"></div></div></main>
+</div>
+<div id="toast"></div>
+
+<script>
+const PASS='staff123'; // DEMO ONLY: real version checks on the server
+const $=id=>document.getElementById(id);
+const CC=[['+91','🇮🇳 India +91'],['+1','🇺🇸 USA/Canada +1'],['+44','🇬🇧 UK +44'],['+971','🇦🇪 UAE +971'],['+65','🇸🇬 Singapore +65'],['+61','🇦🇺 Australia +61'],['+49','🇩🇪 Germany +49'],['+33','🇫🇷 France +33'],['+81','🇯🇵 Japan +81'],['+86','🇨🇳 China +86'],['+880','🇧🇩 Bangladesh +880'],['+94','🇱🇰 Sri Lanka +94'],['+977','🇳🇵 Nepal +977'],['+92','🇵🇰 Pakistan +92'],['+966','🇸🇦 Saudi Arabia +966'],['+27','🇿🇦 South Africa +27']];
+$('cc').innerHTML=CC.map(c=>'<option value="'+c[0]+'">'+c[1]+'</option>').join('');
+const S={q:[],last:0,serving:null,avg:6,waits:[],done:0,log:[]};
+let me=null,authed=false;
+const tokStr=n=>'A-'+(100+n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2600)}
+function save(){try{localStorage.setItem('qline2',JSON.stringify(S))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('qline2')||'null');if(d)Object.assign(S,d)}catch(e){}
+  try{me=JSON.parse(localStorage.getItem('qline2me')||'null')}catch(e){}
+  try{authed=sessionStorage.getItem('qline2auth')==='1'}catch(e){}}
+function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+const mask=p=>p.slice(0,-4).replace(/\d(?=.{0,})/g,(m,i)=>i>3?'•':m)+p.slice(-2);
+function send(p,text){ // simulated WhatsApp; real version calls WhatsApp Business API on the server
+  if(!p.phone||!p.wa)return;S.log.unshift({to:p.phone,text,at:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});S.log=S.log.slice(0,8)}
+function validPhone(cc,n){return cc==='+91'?/^[6-9]\d{9}$/.test(n):/^\d{6,14}$/.test(n)}
+
+/* ----- customer actions ----- */
+$('joinBtn').onclick=()=>{
+  const name=$('n').value.trim(),cc=$('cc').value,num=$('p').value.replace(/\D/g,'').replace(/^0+/,'');
+  if(!name){$('perr').textContent='Please enter your name.';return}
+  if(!validPhone(cc,num)){$('perr').textContent=cc==='+91'?'Enter a valid 10-digit Indian mobile number.':'Enter a valid phone number (6 to 14 digits).';return}
+  $('perr').textContent='';load();S.last++;
+  const p={id:S.last,name,size:$('s').value,phone:cc+num,wa:$('consent').checked,at:Date.now()};
+  S.q.push(p);me=p.id;send(p,'You’re in the queue at Sunrise Clinic. Token '+tokStr(p.id)+'.');
+  save();try{localStorage.setItem('qline2me',JSON.stringify(me))}catch(e){}render();toast('You’re in! Token '+tokStr(p.id))};
+$('leave').onclick=()=>{load();S.q=S.q.filter(p=>p.id!==me);me=null;save();try{localStorage.removeItem('qline2me')}catch(e){}render()};
+
+/* ----- staff actions (only reachable after login) ----- */
+function guard(){if(!authed){route();return false}load();return true}
+$('loginBtn').onclick=()=>{if($('pw').value===PASS){authed=true;try{sessionStorage.setItem('qline2auth','1')}catch(e){}$('pw').value='';$('lerr').textContent='';route()}else $('lerr').textContent='Incorrect password.'};
+$('pw').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};
+$('logout').onclick=()=>{authed=false;try{sessionStorage.removeItem('qline2auth')}catch(e){}route()};
+$('next').onclick=()=>{if(!guard())return;if(S.serving)S.done++;
+  if(!S.q.length){S.serving=null;save();render();toast('Queue is empty');return}
+  const p=S.q.shift();S.serving=p;S.waits.push((Date.now()-p.at)/60000);
+  send(p,'It’s your turn! Token '+tokStr(p.id)+', please go to Counter 1.');
+  if(S.q[1])send(S.q[1],'Almost there: 2 people ahead of you.');
+  save();render();toast(p.wa?'WhatsApp sent to '+p.phone:'Called '+p.name)};
+$('done').onclick=()=>{if(!guard())return;if(S.serving)S.done++;S.serving=null;save();render()};
+$('ns').onclick=()=>{if(!guard())return;S.serving=null;save();render();toast('Marked as no-show')};
+$('addw').onclick=()=>{if(!guard())return;S.last++;S.q.push({id:S.last,name:$('wn').value.trim()||'Walk-in',size:1,phone:'',wa:false,at:Date.now()});$('wn').value='';save();render()};
+$('avg').oninput=e=>{if(!guard())return;S.avg=+e.target.value;save();render()};
+window.rm=id=>{if(!guard())return;S.q=S.q.filter(p=>p.id!==id);save();render()};
+
+/* ----- rendering ----- */
+function render(){
+  const now=S.serving?tokStr(S.serving.id):'-';
+  ['cNow','sNow','bNow'].forEach(i=>$(i).textContent=now);
+  $('bNext').innerHTML=S.q.slice(0,4).map(p=>'<div>'+tokStr(p.id)+'</div>').join('')||'<span class="mut">No one waiting</span>';
+  if(authed){
+    $('sName').textContent=S.serving?S.serving.name+' ('+S.serving.size+' people)':'Nobody yet';
+    $('stW').textContent=S.q.length;$('stD').textContent=S.done;
+    $('stA').textContent=S.waits.length?Math.round(S.waits.reduce((a,b)=>a+b,0)/S.waits.length):0;
+    $('avgV').textContent=S.avg;$('avg').value=S.avg;
+    $('list').innerHTML=S.q.map((p,i)=>'<div class="row"><span class="tok">'+tokStr(p.id)+'</span><div style="flex:1"><b>'+esc(p.name)+'</b><div class="mut">'+(p.phone?esc(mask(p.phone))+' · ':'')+p.size+' people · ~'+(i+1)*S.avg+' min</div></div><button class="btn ghost" style="padding:6px 10px" onclick="rm('+p.id+')">Remove</button></div>').join('')||'<p class="mut">Queue is empty.</p>';
+    $('log').innerHTML=S.log.map(l=>'<div class="log"><b>WhatsApp → '+esc(mask(l.to))+'</b> · '+l.at+'<br>'+esc(l.text)+'</div>').join('')||'<p class="mut">Alerts you trigger appear here.</p>'}
+  const idx=S.q.findIndex(p=>p.id===me),t=$('ticket'),j=$('joinCard');
+  if(me&&(idx>=0||(S.serving&&S.serving.id===me))){
+    j.classList.add('hide');t.classList.remove('hide','turn');$('tk').textContent=tokStr(me);
+    if(idx>=0){$('pos').textContent='You’re '+ord(idx+1)+' in line';$('eta').textContent='Estimated wait ~'+(idx+1)*S.avg+' min';$('pb').style.width=Math.max(8,100-idx*18)+'%';$('sub').textContent='Step out and come back. We’ll notify you on WhatsApp.'}
+    else{t.classList.add('turn');$('pos').textContent='It’s your turn!';$('eta').textContent='Please go to Counter 1';$('pb').style.width='100%';$('sub').textContent=''}
+  }else{if(me&&idx<0&&!(S.serving&&S.serving.id===me)){me=null;try{localStorage.removeItem('qline2me')}catch(e){}}t.classList.add('hide');j.classList.remove('hide')}}
+
+/* ----- router: each URL shows ONE page and nothing else ----- */
+function route(){
+  const h=location.hash.slice(1),page=['join','staff','board'].includes(h)?h:'join'; // default = customer page
+  ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide',x!==page));
+  if(page==='staff'){$('login').classList.toggle('hide',authed);$('console').classList.toggle('hide',!authed)}
+  render()}
+window.addEventListener('hashchange',route);
+window.addEventListener('storage',()=>{load();render()}); // live sync across tabs
+setInterval(()=>{load();render()},3000);
+load();route();
+</script>
+</body>
+</html>
