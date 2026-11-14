@@ -3,160 +3,568 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QLine · Live Queue Management</title>
+<title>QLine · Divine Taste Restaurant &amp; Banquet</title>
 <style>
-:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#4f46e5;--acc2:#06b6d4;--ok:#16a34a;--bad:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}}
-:root[data-theme="dark"]{--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#818cf8;--acc2:#22d3ee}
+:root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#d97706;--acc2:#f59e0b;--ok:#16a34a;--bad:#dc2626;--wa:#25d366;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#f59e0b;--acc2:#fbbf24}}
+:root[data-theme="dark"]{--bg:#0b1120;--card:#131c31;--ink:#f1f5f9;--mut:#94a3b8;--line:#22304d;--acc:#f59e0b;--acc2:#fbbf24}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:960px;margin:0 auto;padding:16px}.narrow{max-width:460px}
+.wrap{max-width:960px;margin:0 auto;padding:16px}.narrow{max-width:480px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .logo{font-weight:800;font-size:20px;letter-spacing:-.5px}.logo b{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(22,163,74,.12);color:var(--ok);border:1px solid rgba(22,163,74,.25);display:inline-flex;align-items:center;gap:4px}
+.badge.warn{background:rgba(217,119,6,.12);color:var(--acc);border-color:rgba(217,119,6,.25)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}@media(max-width:760px){.grid{grid-template-columns:1fr}}
 h2{margin:0 0 10px;font-size:16px}.mut{color:var(--mut);font-size:13px}
 .big{font-size:64px;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
 input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin:4px 0 12px}
-label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{width:42%;flex:none}
-.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--acc);color:#fff}
-.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.full{width:100%}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
-.tok{font-weight:800;color:var(--acc);min-width:42px}.acts{display:flex;gap:6px;flex-wrap:wrap}
-.ticket{text-align:center}.ticket .big{font-size:76px;margin:6px 0}
-.turn{background:linear-gradient(135deg,var(--ok),var(--acc2));color:#fff}.turn .mut,.turn h2{color:#fff}
+label{font-size:13px;font-weight:600}.phone{display:flex;gap:8px}.phone select{width:45%;flex:none}
+.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--acc);color:#fff;transition:.15s;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.wa{background:var(--wa);color:#fff}.btn.full{width:100%}
+.chk{display:flex;gap:8px;align-items:flex-start;margin:6px 0 14px;font-size:12px;color:var(--mut);cursor:pointer}.chk input{width:auto;margin:3px 0 0}
+.err{color:var(--bad);font-size:12px;margin:-6px 0 10px;min-height:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.tok{font-weight:800;color:var(--acc);min-width:44px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}.acts .btn{padding:7px 11px;font-size:13px}
+.ticket{text-align:center;padding:28px 20px}.ticket .big{font-size:74px;margin:8px 0}
+.turn{background:linear-gradient(135deg,rgba(22,163,74,.15),rgba(245,158,11,.15));border:2px solid var(--ok);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.02)}}
 .bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin:14px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
-.board{text-align:center;padding:32px 16px}.board .big{font-size:120px}
-.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}.chips div{padding:10px 18px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:700;font-size:20px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stats .card{padding:14px;text-align:center;margin:0}.stats b{font-size:24px;display:block}
-.log{font-size:13px;padding:8px 10px;border-left:3px solid #25d366;background:var(--bg);border-radius:6px;margin-bottom:6px}
-.err{color:var(--bad);font-size:13px;min-height:18px;margin:-6px 0 8px}
-.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px}.chk input{width:auto;margin:3px 0 0}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,90px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;transition:.35s;max-width:90%;z-index:9}#toast.on{transform:translate(-50%,0)}
+.board{text-align:center;padding:36px 16px}.board .big{font-size:120px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}.chips div{padding:12px 20px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:700;font-size:22px;color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.stats .card{padding:14px;text-align:center;margin:0}.stats b{font-size:24px;display:block}
+.log{font-size:12px;border-bottom:1px solid var(--line);padding:8px 0;line-height:1.4}.log:last-child{border:0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,80px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;transition:.35s;max-width:90%;z-index:99;box-shadow:0 4px 12px rgba(0,0,0,.25)}#toast.on{transform:translate(-50%,0)}
 .hide{display:none}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="wrap">
 
-<!-- ===== PAGE 1: CUSTOMER (what the QR opens) ===== -->
+<!-- ===== PAGE 1: CUSTOMER TICKET / JOIN ===== -->
 <main id="join" class="hide narrow">
-<header><div class="logo"><b>QLine</b></div><span class="mut">Sunrise Clinic · MG Road</span></header>
-<div class="card" id="joinCard"><h2>Join the queue</h2><p class="mut">No app needed. We’ll message you when it’s almost your turn.</p>
-<label>Your name</label><input id="n" placeholder="e.g. Priya Sharma" autocomplete="name">
-<label>WhatsApp number</label>
-<div class="phone"><select id="cc"></select><input id="p" inputmode="numeric" placeholder="98765 43210" autocomplete="tel-national"></div>
-<div class="err" id="perr"></div>
-<label>People</label><select id="s"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
-<label class="chk"><input type="checkbox" id="consent" checked><span>Send my queue updates on WhatsApp. Used only for this visit and deleted after 30 days.</span></label>
-<button class="btn full" id="joinBtn">Get my token</button></div>
-<div class="card ticket hide" id="ticket"><div class="mut">Your token</div><div class="big" id="tk">-</div>
-<h2 id="pos"></h2><div class="bar"><i id="pb"></i></div><div class="mut" id="eta"></div>
-<p class="mut" id="sub"></p><p class="mut">Now serving: <b id="cNow">-</b></p><button class="btn ghost" id="leave">Leave queue</button></div>
-<p class="mut" style="text-align:center"><a href="#staff" style="color:var(--mut)">Staff sign in</a></p>
+<header>
+  <div>
+    <div class="logo"><b>Divine Taste</b></div>
+    <span class="mut">Restaurant &amp; Banquet · Live Queue</span>
+  </div>
+  <div id="syncBadge" class="badge">🟢 Live Sync</div>
+</header>
+
+<div class="card" id="joinCard">
+  <h2>Scan &amp; join the queue</h2>
+  <p class="mut">Get a live tracker link on your phone. No app needed.</p>
+  <label>Your Name</label>
+  <input id="n" placeholder="e.g. Priya Sharma" autocomplete="name">
+  <label>WhatsApp Number</label>
+  <div class="phone">
+    <select id="cc"></select>
+    <input id="p" inputmode="numeric" placeholder="98765 43210" autocomplete="tel-national">
+  </div>
+  <div class="err" id="perr"></div>
+  <label>Party Size (People)</label>
+  <select id="s">
+    <option value="1">1 person</option>
+    <option value="2" selected>2 people</option>
+    <option value="3">3 people</option>
+    <option value="4">4 people</option>
+    <option value="5+">5+ people (Large table)</option>
+  </select>
+  <label class="chk">
+    <input type="checkbox" id="consent" checked>
+    <span>Send my queue tracker link to my WhatsApp.</span>
+  </label>
+  <button class="btn full" id="joinBtn">Get my token</button>
+</div>
+
+<div class="card ticket hide" id="ticket">
+  <div class="mut">Your Queue Token</div>
+  <div class="big" id="tk">-</div>
+  <h2 id="pos"></h2>
+  <div class="bar"><i id="pb"></i></div>
+  <div class="mut" id="eta"></div>
+  <p class="mut" id="sub"></p>
+  <div style="margin:16px 0;display:flex;flex-direction:column;gap:8px">
+    <a id="waSendBtn" class="btn wa full" target="_blank" href="#">📲 Open / Send on WhatsApp</a>
+    <button class="btn ghost full" id="copyLinkBtn">🔗 Copy Tracker Link</button>
+  </div>
+  <p class="mut">Now serving: <b id="cNow">-</b></p>
+  <button class="btn ghost" id="leave" style="margin-top:8px">Leave queue</button>
+</div>
+
+<p class="mut" style="text-align:center;margin-top:20px">
+  <a href="#staff" style="color:var(--mut);text-decoration:none">Staff console →</a>
+</p>
 </main>
 
-<!-- ===== PAGE 2: STAFF (login required) ===== -->
+<!-- ===== PAGE 2: STAFF DASHBOARD ===== -->
 <main id="staff" class="hide">
-<div id="login" class="narrow" style="margin:40px auto"><div class="card"><div class="logo" style="margin-bottom:12px"><b>QLine</b> Staff</div>
-<h2>Sign in</h2><label>Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Staff password">
-<div class="err" id="lerr"></div><button class="btn full" id="loginBtn">Sign in</button>
-<p class="mut" style="margin-top:12px">Demo password: <b>staff123</b></p></div></div>
+<div id="login" class="narrow" style="margin:40px auto">
+  <div class="card">
+    <div class="logo" style="margin-bottom:12px"><b>Divine Taste</b> Staff</div>
+    <h2>Sign in</h2>
+    <label>Password</label>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Enter staff password">
+    <div class="err" id="lerr"></div>
+    <button class="btn full" id="loginBtn">Sign in</button>
+    <p class="mut" style="margin-top:12px">Demo password: <b>staff123</b></p>
+  </div>
+</div>
+
 <div id="console" class="hide">
-<header><div class="logo"><b>QLine</b> Staff · <span class="mut">Sunrise Clinic</span></div><button class="btn ghost" id="logout">Log out</button></header>
-<div class="stats"><div class="card"><b id="stW">0</b><span class="mut">Waiting</span></div><div class="card"><b id="stD">0</b><span class="mut">Served</span></div><div class="card"><b id="stA">0</b><span class="mut">Avg wait (min)</span></div></div>
-<div class="grid" style="margin-top:16px"><div>
-<div class="card"><h2>Now serving</h2><div class="big" id="sNow">-</div><p id="sName" class="mut">Nobody yet</p>
-<div class="acts"><button class="btn" id="next">Call next</button><button class="btn ok" id="done">Complete</button><button class="btn bad" id="ns">No-show</button></div></div>
-<div class="card"><h2>Add walk-in</h2><input id="wn" placeholder="Name"><button class="btn ghost" id="addw">Add to queue</button>
-<p class="mut" style="margin-top:14px">Avg minutes per person: <b id="avgV">6</b></p><input type="range" id="avg" min="2" max="30" value="6"></div></div>
-<div><div class="card"><h2>Waiting list</h2><div id="list"></div></div>
-<div class="card"><h2>Message log</h2><div id="log"><p class="mut">Alerts you trigger appear here.</p></div></div>
-<div class="card"><h2>Share links</h2><p class="mut">Customer QR points to: <b>…#join</b><br>Waiting-room screen: <b>…#board</b></p></div></div></div></div>
+  <header>
+    <div>
+      <div class="logo"><b>Divine Taste</b> Staff Console</div>
+      <span class="mut">Restaurant &amp; Banquet</span>
+    </div>
+    <button class="btn ghost" id="logout">Log out</button>
+  </header>
+
+  <div class="stats">
+    <div class="card"><b id="stW">0</b><span class="mut">Waiting</span></div>
+    <div class="card"><b id="stD">0</b><span class="mut">Served</span></div>
+    <div class="card"><b id="stA">0</b><span class="mut">Avg wait (min)</span></div>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div>
+      <div class="card">
+        <h2>Now serving</h2>
+        <div class="big" id="sNow">-</div>
+        <p id="sName" class="mut">Nobody yet</p>
+        <div class="acts" style="margin-top:12px">
+          <button class="btn" id="next">Call next</button>
+          <button class="btn ok" id="done">Complete</button>
+          <button class="btn bad" id="ns">No-show</button>
+          <a id="sWaBtn" class="btn wa hide" target="_blank" href="#">📲 WhatsApp Customer</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Add Walk-in Party</h2>
+        <label>Guest Name</label>
+        <input id="wn" placeholder="e.g. Rahul Patel">
+        <label>WhatsApp Number (Optional)</label>
+        <div class="phone">
+          <select id="wcc"></select>
+          <input id="wp" inputmode="numeric" placeholder="Mobile number">
+        </div>
+        <label>Party Size</label>
+        <select id="ws">
+          <option value="1">1 person</option>
+          <option value="2" selected>2 people</option>
+          <option value="3">3 people</option>
+          <option value="4">4 people</option>
+          <option value="5+">5+ people</option>
+        </select>
+        <button class="btn ghost full" id="addw">Add to queue</button>
+
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <p class="mut">Avg minutes per table: <b id="avgV">6</b></p>
+        <input type="range" id="avg" min="2" max="30" value="6">
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Waiting List</h2>
+        <div id="list"><p class="mut">Queue is empty.</p></div>
+      </div>
+      <div class="card">
+        <h2>Message &amp; Alert Log</h2>
+        <div id="log"><p class="mut">Outbound alerts appear here.</p></div>
+      </div>
+      <div class="card">
+        <h2>Live Screen Links</h2>
+        <p class="mut">
+          Customer QR Scan: <a href="#join" style="color:var(--acc);font-weight:700">#join</a><br>
+          Waiting-Area TV Display: <a href="#board" target="_blank" style="color:var(--acc);font-weight:700">#board</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 
-<!-- ===== PAGE 3: DISPLAY BOARD (read-only, no names or numbers) ===== -->
-<main id="board" class="hide"><div class="card board"><div class="mut" style="font-size:20px">NOW SERVING</div><div class="big" id="bNow">-</div><div class="mut">Up next</div><div class="chips" id="bNext"></div></div></main>
+<!-- ===== PAGE 3: TV DISPLAY BOARD ===== -->
+<main id="board" class="hide">
+  <div class="card board">
+    <div class="mut" style="font-size:22px;letter-spacing:1px">NOW SERVING · DIVINE TASTE</div>
+    <div class="big" id="bNow">-</div>
+    <div class="mut" style="margin-top:20px;font-size:16px">UP NEXT</div>
+    <div class="chips" id="bNext"></div>
+  </div>
+</main>
+
 </div>
 <div id="toast"></div>
 
 <script>
-const PASS='staff123'; // DEMO ONLY: real version checks on the server
+const PASS='staff123';
+const RESTAURANT='Divine Taste Restaurant & Banquet';
 const $=id=>document.getElementById(id);
-const CC=[['+91','🇮🇳 India +91'],['+1','🇺🇸 USA/Canada +1'],['+44','🇬🇧 UK +44'],['+971','🇦🇪 UAE +971'],['+65','🇸🇬 Singapore +65'],['+61','🇦🇺 Australia +61'],['+49','🇩🇪 Germany +49'],['+33','🇫🇷 France +33'],['+81','🇯🇵 Japan +81'],['+86','🇨🇳 China +86'],['+880','🇧🇩 Bangladesh +880'],['+94','🇱🇰 Sri Lanka +94'],['+977','🇳🇵 Nepal +977'],['+92','🇵🇰 Pakistan +92'],['+966','🇸🇦 Saudi Arabia +966'],['+27','🇿🇦 South Africa +27']];
-$('cc').innerHTML=CC.map(c=>'<option value="'+c[0]+'">'+c[1]+'</option>').join('');
-const S={q:[],last:0,serving:null,avg:6,waits:[],done:0,log:[]};
-let me=null,authed=false;
+
+const CC=[
+  ['+91','🇮🇳 India +91'],['+1','🇺🇸 USA/Canada +1'],['+44','🇬🇧 UK +44'],
+  ['+971','🇦🇪 UAE +971'],['+65','🇸🇬 Singapore +65'],['+61','🇦🇺 Australia +61'],
+  ['+49','🇩🇪 Germany +49'],['+33','🇫🇷 France +33'],['+81','🇯🇵 Japan +81'],
+  ['+86','🇨🇳 China +86'],['+880','🇧🇩 Bangladesh +880'],['+94','🇱🇰 Sri Lanka +94'],
+  ['+977','🇳🇵 Nepal +977'],['+92','🇵🇰 Pakistan +92'],['+966','🇸🇦 Saudi Arabia +966']
+];
+
+['cc','wcc'].forEach(id=>{
+  const el=$(id);
+  if(el)el.innerHTML=CC.map(c=>'<option value="'+c[0]+'">'+c[1]+'</option>').join('');
+});
+
+let S={q:[],last:0,serving:null,avg:6,waits:[],done:0,log:[]};
+let me=null, authed=false, firestoreDb=null;
+
 const tokStr=n=>'A-'+(100+n);
+const parseTok=s=>{
+  if(!s)return null;
+  const m=String(s).match(/(\d+)/);
+  return m?+m[1]:null;
+};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2600)}
-function save(){try{localStorage.setItem('qline2',JSON.stringify(S))}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('qline2')||'null');if(d)Object.assign(S,d)}catch(e){}
-  try{me=JSON.parse(localStorage.getItem('qline2me')||'null')}catch(e){}
-  try{authed=sessionStorage.getItem('qline2auth')==='1'}catch(e){}}
-function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
 const mask=p=>p.slice(0,-4).replace(/\d(?=.{0,})/g,(m,i)=>i>3?'•':m)+p.slice(-2);
-function send(p,text){ // simulated WhatsApp; real version calls WhatsApp Business API on the server
-  if(!p.phone||!p.wa)return;S.log.unshift({to:p.phone,text,at:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});S.log=S.log.slice(0,8)}
+function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+
+function toast(m){
+  const t=$('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2800);
+}
+
+function getTrackUrl(tokenId){
+  return location.origin + location.pathname + '#token=' + (100+tokenId);
+}
+
+function buildWaUrl(phone, msg){
+  const cleanPhone = (phone||'').replace(/\D/g,'');
+  if(!cleanPhone)return '#';
+  return 'https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent(msg);
+}
+
+/* ----- Firebase Realtime Cloud Sync ----- */
+function initFirebase(){
+  try{
+    const firebaseConfig = {
+      apiKey: "AIzaSyCkbvILQaJe6-VMpy-n4ZyKuUci2QL3w5M",
+      authDomain: "the-prophets-fa285.firebaseapp.com",
+      projectId: "the-prophets-fa285",
+      storageBucket: "the-prophets-fa285.firebasestorage.app",
+      messagingSenderId: "254205483242",
+      appId: "1:254205483242:web:8318083e28dce24813df93"
+    };
+    if(window.firebase && !firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
+      firestoreDb = firebase.firestore();
+      firestoreDb.collection('qline').doc('live_queue').onSnapshot(doc=>{
+        if(doc.exists){
+          const data = doc.data();
+          if(data && data.last >= S.last){
+            Object.assign(S, data);
+            saveLocal();
+            render();
+            updateSyncBadge(true);
+          }
+        }
+      }, err=>{
+        console.warn('Firestore sync restricted, running in robust local sync mode:', err.message);
+        updateSyncBadge(false);
+      });
+    }
+  }catch(e){
+    console.warn('Firebase init skipped:', e);
+    updateSyncBadge(false);
+  }
+}
+
+function updateSyncBadge(isLive){
+  const b=$('syncBadge');
+  if(!b)return;
+  if(isLive){
+    b.className='badge';b.textContent='🟢 Cloud Synced';
+  }else{
+    b.className='badge warn';b.textContent='⚡ Live Local Mode';
+  }
+}
+
+function saveLocal(){try{localStorage.setItem('qline2',JSON.stringify(S))}catch(e){}}
+function loadLocal(){
+  try{const d=JSON.parse(localStorage.getItem('qline2')||'null');if(d)Object.assign(S,d)}catch(e){}
+  try{me=JSON.parse(localStorage.getItem('qline2me')||'null')}catch(e){}
+  try{authed=sessionStorage.getItem('qline2auth')==='1'}catch(e){}
+}
+
+function syncState(){
+  saveLocal();
+  if(firestoreDb){
+    try{
+      firestoreDb.collection('qline').doc('live_queue').set(S).catch(()=>{});
+    }catch(e){}
+  }
+  render();
+}
+
+function logMessage(to, text){
+  if(!to)return;
+  S.log.unshift({to, text, at:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+  S.log = S.log.slice(0, 10);
+}
+
 function validPhone(cc,n){return cc==='+91'?/^[6-9]\d{9}$/.test(n):/^\d{6,14}$/.test(n)}
 
-/* ----- customer actions ----- */
+/* ----- Customer Actions ----- */
 $('joinBtn').onclick=()=>{
-  const name=$('n').value.trim(),cc=$('cc').value,num=$('p').value.replace(/\D/g,'').replace(/^0+/,'');
+  const name=$('n').value.trim(), cc=$('cc').value, num=$('p').value.replace(/\D/g,'').replace(/^0+/,'');
   if(!name){$('perr').textContent='Please enter your name.';return}
-  if(!validPhone(cc,num)){$('perr').textContent=cc==='+91'?'Enter a valid 10-digit Indian mobile number.':'Enter a valid phone number (6 to 14 digits).';return}
-  $('perr').textContent='';load();S.last++;
-  const p={id:S.last,name,size:$('s').value,phone:cc+num,wa:$('consent').checked,at:Date.now()};
-  S.q.push(p);me=p.id;send(p,'You’re in the queue at Sunrise Clinic. Token '+tokStr(p.id)+'.');
-  save();try{localStorage.setItem('qline2me',JSON.stringify(me))}catch(e){}render();toast('You’re in! Token '+tokStr(p.id))};
-$('leave').onclick=()=>{load();S.q=S.q.filter(p=>p.id!==me);me=null;save();try{localStorage.removeItem('qline2me')}catch(e){}render()};
+  if(!validPhone(cc,num)){$('perr').textContent=cc==='+91'?'Enter a valid 10-digit mobile number.':'Enter a valid phone number (6 to 14 digits).';return}
+  $('perr').textContent='';
+  
+  loadLocal();
+  S.last++;
+  const fullPhone = cc+num;
+  const p={id:S.last, name, size:$('s').value, phone:fullPhone, wa:$('consent').checked, at:Date.now()};
+  S.q.push(p);
+  me=p.id;
+  try{localStorage.setItem('qline2me',JSON.stringify(me))}catch(e){}
 
-/* ----- staff actions (only reachable after login) ----- */
-function guard(){if(!authed){route();return false}load();return true}
-$('loginBtn').onclick=()=>{if($('pw').value===PASS){authed=true;try{sessionStorage.setItem('qline2auth','1')}catch(e){}$('pw').value='';$('lerr').textContent='';route()}else $('lerr').textContent='Incorrect password.'};
+  const msg = '🍽️ *'+RESTAURANT+'*\nHello '+p.name+'! Your queue token is *'+tokStr(p.id)+'*\nParty: '+p.size+'\nEst. wait: ~'+S.q.length*S.avg+' min\n\n📍 Track your live status here:\n'+getTrackUrl(p.id);
+  logMessage(fullPhone, msg);
+  syncState();
+  toast('You’re in! Token '+tokStr(p.id));
+
+  // Open WhatsApp directly if opted-in
+  if(p.wa){
+    const waUrl = buildWaUrl(fullPhone, msg);
+    window.open(waUrl, '_blank');
+  }
+};
+
+$('leave').onclick=()=>{
+  loadLocal();
+  S.q=S.q.filter(p=>p.id!==me);
+  me=null;
+  try{localStorage.removeItem('qline2me')}catch(e){}
+  syncState();
+  try{history.replaceState(null,'','#join')}catch(e){}
+};
+
+$('copyLinkBtn').onclick=()=>{
+  if(!me)return;
+  const url = getTrackUrl(me);
+  navigator.clipboard.writeText(url).then(()=>toast('Tracker link copied to clipboard!')).catch(()=>toast(url));
+};
+
+/* ----- Staff Actions ----- */
+function guard(){if(!authed){route();return false}loadLocal();return true}
+
+$('loginBtn').onclick=()=>{
+  if($('pw').value===PASS){
+    authed=true;
+    try{sessionStorage.setItem('qline2auth','1')}catch(e){}
+    $('pw').value='';$('lerr').textContent='';route();
+  }else $('lerr').textContent='Incorrect password.';
+};
 $('pw').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};
 $('logout').onclick=()=>{authed=false;try{sessionStorage.removeItem('qline2auth')}catch(e){}route()};
-$('next').onclick=()=>{if(!guard())return;if(S.serving)S.done++;
-  if(!S.q.length){S.serving=null;save();render();toast('Queue is empty');return}
-  const p=S.q.shift();S.serving=p;S.waits.push((Date.now()-p.at)/60000);
-  send(p,'It’s your turn! Token '+tokStr(p.id)+', please go to Counter 1.');
-  if(S.q[1])send(S.q[1],'Almost there: 2 people ahead of you.');
-  save();render();toast(p.wa?'WhatsApp sent to '+p.phone:'Called '+p.name)};
-$('done').onclick=()=>{if(!guard())return;if(S.serving)S.done++;S.serving=null;save();render()};
-$('ns').onclick=()=>{if(!guard())return;S.serving=null;save();render();toast('Marked as no-show')};
-$('addw').onclick=()=>{if(!guard())return;S.last++;S.q.push({id:S.last,name:$('wn').value.trim()||'Walk-in',size:1,phone:'',wa:false,at:Date.now()});$('wn').value='';save();render()};
-$('avg').oninput=e=>{if(!guard())return;S.avg=+e.target.value;save();render()};
-window.rm=id=>{if(!guard())return;S.q=S.q.filter(p=>p.id!==id);save();render()};
 
-/* ----- rendering ----- */
+$('next').onclick=()=>{
+  if(!guard())return;
+  if(S.serving)S.done++;
+  if(!S.q.length){
+    S.serving=null;syncState();toast('Queue is empty');return;
+  }
+  const p=S.q.shift();
+  S.serving=p;
+  S.waits.push((Date.now()-p.at)/60000);
+
+  const callMsg = '🍽️ *'+RESTAURANT+'*\nIt’s your turn! Token *'+tokStr(p.id)+'*, your table is ready. Please proceed to the host desk.';
+  logMessage(p.phone, callMsg);
+
+  if(S.q[1]){
+    logMessage(S.q[1].phone, '🍽️ *'+RESTAURANT+'*: Almost there! 2 parties ahead of you.');
+  }
+
+  syncState();
+  toast('Called '+p.name+' ('+tokStr(p.id)+')');
+
+  if(p.phone){
+    window.open(buildWaUrl(p.phone, callMsg), '_blank');
+  }
+};
+
+$('done').onclick=()=>{if(!guard())return;if(S.serving)S.done++;S.serving=null;syncState()};
+$('ns').onclick=()=>{if(!guard())return;S.serving=null;syncState();toast('Marked as no-show')};
+
+$('addw').onclick=()=>{
+  if(!guard())return;
+  const name=$('wn').value.trim()||'Walk-in';
+  const cc=$('wcc').value, num=$('wp').value.replace(/\D/g,'').replace(/^0+/,'');
+  const phone = num ? (cc+num) : '';
+  S.last++;
+  const p={id:S.last, name, size:$('ws').value, phone, wa:!!phone, at:Date.now()};
+  S.q.push(p);
+  $('wn').value='';$('wp').value='';
+  
+  if(phone){
+    const msg='🍽️ *'+RESTAURANT+'*\nWelcome '+name+'! Your token is *'+tokStr(p.id)+'* ('+p.size+'). Track your live turn:\n'+getTrackUrl(p.id);
+    logMessage(phone, msg);
+    window.open(buildWaUrl(phone, msg), '_blank');
+  }
+  syncState();
+  toast('Added '+name+' ('+tokStr(p.id)+')');
+};
+
+$('avg').oninput=e=>{if(!guard())return;S.avg=+e.target.value;syncState()};
+window.rm=id=>{if(!guard())return;S.q=S.q.filter(p=>p.id!==id);syncState()};
+
+window.sendWaReminder=id=>{
+  const p = (S.serving && S.serving.id===id) ? S.serving : S.q.find(x=>x.id===id);
+  if(!p || !p.phone){toast('No phone number for this guest');return;}
+  const isNow = S.serving && S.serving.id===id;
+  const msg = isNow 
+    ? '🍽️ *'+RESTAURANT+'*\nIt’s your turn! Token *'+tokStr(p.id)+'*, your table is ready.'
+    : '🍽️ *'+RESTAURANT+'*\nHello '+p.name+'! Your token is *'+tokStr(p.id)+'*. Live status:\n'+getTrackUrl(p.id);
+  window.open(buildWaUrl(p.phone, msg), '_blank');
+};
+
+/* ----- Rendering ----- */
 function render(){
   const now=S.serving?tokStr(S.serving.id):'-';
-  ['cNow','sNow','bNow'].forEach(i=>$(i).textContent=now);
-  $('bNext').innerHTML=S.q.slice(0,4).map(p=>'<div>'+tokStr(p.id)+'</div>').join('')||'<span class="mut">No one waiting</span>';
-  if(authed){
-    $('sName').textContent=S.serving?S.serving.name+' ('+S.serving.size+' people)':'Nobody yet';
-    $('stW').textContent=S.q.length;$('stD').textContent=S.done;
-    $('stA').textContent=S.waits.length?Math.round(S.waits.reduce((a,b)=>a+b,0)/S.waits.length):0;
-    $('avgV').textContent=S.avg;$('avg').value=S.avg;
-    $('list').innerHTML=S.q.map((p,i)=>'<div class="row"><span class="tok">'+tokStr(p.id)+'</span><div style="flex:1"><b>'+esc(p.name)+'</b><div class="mut">'+(p.phone?esc(mask(p.phone))+' · ':'')+p.size+' people · ~'+(i+1)*S.avg+' min</div></div><button class="btn ghost" style="padding:6px 10px" onclick="rm('+p.id+')">Remove</button></div>').join('')||'<p class="mut">Queue is empty.</p>';
-    $('log').innerHTML=S.log.map(l=>'<div class="log"><b>WhatsApp → '+esc(mask(l.to))+'</b> · '+l.at+'<br>'+esc(l.text)+'</div>').join('')||'<p class="mut">Alerts you trigger appear here.</p>'}
-  const idx=S.q.findIndex(p=>p.id===me),t=$('ticket'),j=$('joinCard');
-  if(me&&(idx>=0||(S.serving&&S.serving.id===me))){
-    j.classList.add('hide');t.classList.remove('hide','turn');$('tk').textContent=tokStr(me);
-    if(idx>=0){$('pos').textContent='You’re '+ord(idx+1)+' in line';$('eta').textContent='Estimated wait ~'+(idx+1)*S.avg+' min';$('pb').style.width=Math.max(8,100-idx*18)+'%';$('sub').textContent='Step out and come back. We’ll notify you on WhatsApp.'}
-    else{t.classList.add('turn');$('pos').textContent='It’s your turn!';$('eta').textContent='Please go to Counter 1';$('pb').style.width='100%';$('sub').textContent=''}
-  }else{if(me&&idx<0&&!(S.serving&&S.serving.id===me)){me=null;try{localStorage.removeItem('qline2me')}catch(e){}}t.classList.add('hide');j.classList.remove('hide')}}
+  ['cNow','sNow','bNow'].forEach(i=>{const el=$(i);if(el)el.textContent=now});
 
-/* ----- router: each URL shows ONE page and nothing else ----- */
+  const bNext=$('bNext');
+  if(bNext){
+    bNext.innerHTML=S.q.slice(0,5).map(p=>'<div>'+tokStr(p.id)+'</div>').join('')||'<span class="mut">No one waiting</span>';
+  }
+
+  // Staff Console View
+  if(authed){
+    $('sName').textContent=S.serving ? S.serving.name+' ('+S.serving.size+' · '+(S.serving.phone?mask(S.serving.phone):'No phone')+')' : 'Nobody yet';
+    $('stW').textContent=S.q.length;
+    $('stD').textContent=S.done;
+    $('stA').textContent=S.waits.length ? Math.round(S.waits.reduce((a,b)=>a+b,0)/S.waits.length) : 0;
+    $('avgV').textContent=S.avg;
+    $('avg').value=S.avg;
+
+    const sWaBtn=$('sWaBtn');
+    if(sWaBtn){
+      if(S.serving && S.serving.phone){
+        sWaBtn.classList.remove('hide');
+        sWaBtn.href=buildWaUrl(S.serving.phone, '🍽️ *'+RESTAURANT+'*: It’s your turn! Token *'+tokStr(S.serving.id)+'*, table is ready.');
+      } else {
+        sWaBtn.classList.add('hide');
+      }
+    }
+
+    $('list').innerHTML=S.q.map((p,i)=>
+      '<div class="row">' +
+        '<span class="tok">'+tokStr(p.id)+'</span>' +
+        '<div style="flex:1">' +
+          '<b>'+esc(p.name)+'</b>' +
+          '<div class="mut">'+(p.phone?esc(mask(p.phone))+' · ':'')+p.size+' · ~'+(i+1)*S.avg+' min</div>' +
+        '</div>' +
+        '<div class="acts">' +
+          (p.phone ? '<button class="btn wa" onclick="sendWaReminder('+p.id+')">📲 WA</button>' : '') +
+          '<button class="btn ghost" onclick="rm('+p.id+')">✕</button>' +
+        '</div>' +
+      '</div>'
+    ).join('')||'<p class="mut">Queue is empty.</p>';
+
+    $('log').innerHTML=S.log.map(l=>
+      '<div class="log"><b>WhatsApp → '+esc(mask(l.to))+'</b> · '+l.at+'<br>'+esc(l.text).replace(/\n/g,'<br>')+'</div>'
+    ).join('')||'<p class="mut">Outbound alerts appear here.</p>';
+  }
+
+  // Customer Ticket View
+  const t=$('ticket'), j=$('joinCard');
+  const effectiveId = me;
+  const idx = S.q.findIndex(p=>p.id===effectiveId);
+  const isServing = S.serving && S.serving.id===effectiveId;
+
+  if(effectiveId && (idx>=0 || isServing)){
+    j.classList.add('hide');
+    t.classList.remove('hide','turn');
+    $('tk').textContent=tokStr(effectiveId);
+
+    const activePerson = isServing ? S.serving : S.q[idx];
+    const userPhone = activePerson ? activePerson.phone : '';
+    const userMsg = isServing
+      ? '🍽️ *'+RESTAURANT+'*: It’s your turn! Token *'+tokStr(effectiveId)+'*, please proceed to the host desk.'
+      : '🍽️ *'+RESTAURANT+'*: My token is *'+tokStr(effectiveId)+'*. Live track:\n'+getTrackUrl(effectiveId);
+
+    $('waSendBtn').href = buildWaUrl(userPhone, userMsg);
+
+    if(idx>=0){
+      $('pos').textContent='You’re '+ord(idx+1)+' in line';
+      $('eta').textContent='Estimated wait ~'+(idx+1)*S.avg+' min';
+      $('pb').style.width=Math.max(8, 100 - idx*18)+'%';
+      $('sub').textContent='Relax nearby. We’ll notify you when your table is ready.';
+    } else {
+      t.classList.add('turn');
+      $('pos').textContent='🎉 It’s your turn!';
+      $('eta').textContent='Your table is ready! Please proceed to the host desk.';
+      $('pb').style.width='100%';
+      $('sub').textContent='';
+    }
+  } else {
+    // If user tracked a token that was finished or not found
+    if(effectiveId && idx<0 && !isServing){
+      if(location.hash.startsWith('#token=')){
+        j.classList.add('hide');
+        t.classList.remove('hide','turn');
+        $('tk').textContent=tokStr(effectiveId);
+        $('pos').textContent='Token Completed';
+        $('eta').textContent='This party has already been seated or served.';
+        $('pb').style.width='100%';
+        $('sub').textContent='Thank you for visiting '+RESTAURANT+'.';
+        return;
+      }
+      me=null;
+      try{localStorage.removeItem('qline2me')}catch(e){}
+    }
+    t.classList.add('hide');
+    j.classList.remove('hide');
+  }
+}
+
+/* ----- Router ----- */
 function route(){
-  const h=location.hash.slice(1),page=['join','staff','board'].includes(h)?h:'join'; // default = customer page
-  ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide',x!==page));
-  if(page==='staff'){$('login').classList.toggle('hide',authed);$('console').classList.toggle('hide',!authed)}
-  render()}
-window.addEventListener('hashchange',route);
-window.addEventListener('storage',()=>{load();render()}); // live sync across tabs
-setInterval(()=>{load();render()},3000);
-load();route();
+  const h=location.hash.slice(1);
+  if(h.startsWith('token=')){
+    const num = parseTok(h.slice(6));
+    if(num){
+      me = num >= 100 ? (num - 100) : num;
+    }
+    ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide', x!=='join'));
+    render();
+    return;
+  }
+
+  const page = ['join','staff','board'].includes(h) ? h : 'join';
+  ['join','staff','board'].forEach(x=>$(x).classList.toggle('hide', x!==page));
+  if(page==='staff'){
+    $('login').classList.toggle('hide', authed);
+    $('console').classList.toggle('hide', !authed);
+  }
+  render();
+}
+
+window.addEventListener('hashchange', route);
+window.addEventListener('storage', ()=>{loadLocal();render()});
+setInterval(()=>{loadLocal();render()}, 3000);
+
+loadLocal();
+initFirebase();
+route();
 </script>
 </body>
 </html>
